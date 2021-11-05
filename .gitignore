@@ -1,1 +1,4 @@
 housegan13/version.py
+build
+*.egg-info
+__pycache__

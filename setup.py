@@ -11,17 +11,24 @@ def shell(*args):
 
 def write_version(version_core, pre_release=True):
     if pre_release:
-        time = shell("git", "log", "-1", "--format=%cd", "--date=iso")
-        time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S %z")
-        time = time.strftime("%Y%m%d%H%M%S")
-        dirty = shell("git", "status", "--porcelain")
+        try:
+            time = shell("git", "log", "-1", "--format=%cd", "--date=iso")
+            time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S %z")
+            time = time.strftime("%Y%m%d%H%M%S")
+        except:
+            time = "0" * 14
+        try:
+            dirty = shell("git", "status", "--porcelain")
+        except:
+            # assume it's dirty
+            dirty = True
         version = f"{version_core}-dev{time}"
         if dirty:
             version += ".dirty"
     else:
         version = version_core
 
-    with open(Path("housegan13", "version.py"), "w") as f:
+    with open(Path("civl5220_group13", "version.py"), "w") as f:
         f.write('__version__ = "{}"\n'.format(version))
 
     return version
@@ -31,15 +38,19 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setup(
-    name="housegan13",
+    name="civl5220_group13",
     python_requires=">=3.9.0",
     version=write_version("0.0.1", True),
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(),
-    install_requires=[],
+    install_requires=[
+        "argparse-node",
+    ],
     url="https://github.com/enhuiz/civl5220-group13",
     entry_points={
-        "console_scripts": [],
+        "console_scripts": [
+            "civl5220_group13-toolkit=civl5220_group13.toolkit:main",
+        ],
     },
 )
