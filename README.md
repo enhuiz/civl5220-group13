@@ -181,7 +181,7 @@ An example training data from: `3rdparty/houseganpp/data/json/7513.json`
 
 Each room has a room type.
 
-According to (here)[https://github.com/ennauata/houseganpp/blob/main/misc/utils.py], room types are:
+According to [here](https://github.com/ennauata/houseganpp/blob/main/misc/utils.py), room types are:
 
 ```python
 {
