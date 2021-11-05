@@ -1,0 +1,6 @@
+[submodule "3rdparty/housegan"]
+	path = 3rdparty/housegan
+	url = https://github.com/ennauata/housegan
+[submodule "3rdparty/houseganpp"]
+	path = 3rdparty/houseganpp
+	url = https://github.com/ennauata/houseganpp
