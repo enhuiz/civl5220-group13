@@ -16,7 +16,7 @@
 
 ### HouseGANPP
 
-By cloning the houseganpp repo,
+Clone the houseganpp repo,
 
 ```
 git clone https://github.com/ennauata/houseganpp
@@ -46,6 +46,44 @@ After this, you need to change the path in `data/sample_list.txt` like this:
 Run `python test.py`, you will get the `dump` folder, which contains something like:
 
 ![](images/fp_final_0.png)
+
+### HouseGAN
+
+Clone the housegan repo,
+
+```
+git clone https://github.com/ennauata/housegan
+```
+
+or clone this repo recursively.
+
+```
+git clone --recurse-submodules https://github.com/enhuiz/civl5220-group13
+```
+
+For HouseGAN, you actually need to download the dataset and pretrained model according to their document (they are not contained in the repo :|). Requirements are also needed to be installed, latest version seemed fine, except for `networkx==2.4` (nov. 6, 2021).
+
+After downloading the model and processed dataset (yes, for this one they provide a processed dataset, `train_data.npy` and `valid_data.npy`), modify those lines of `variation_bbs_with_target_graph_segments_suppl.py` since they named their experiment as `exp_demo` and run for `500_000` iterations.
+
+```
+-numb_iters = 200000
+-exp_name = 'exp_with_graph_global_new'
++numb_iters = 500000   # change the iters, to make the ckpt path right
++exp_name = 'exp_demo' # change the name
+ target_set = 'D'
+ phase='eval'
+ checkpoint = './checkpoints/{}_{}_{}.pth'.format(exp_name, target_set, numb_iters)
+@@ -177,7 +177,7 @@ generator.load_state_dict(torch.load(checkpoint))
+ cuda = True if torch.cuda.is_available() else False
+ if cuda:
+     generator.cuda()
+-rooms_path = '/local-scratch4/nnauata/autodesk/FloorplanDataset/'
++rooms_path = './FloorplanDataset/' # i put those xxx_data.npy here
+```
+
+Then run `python variation_bbs_with_target_graph_segments_suppl.py`, this perhaps needs cuda, you got a folder `output`, with output like this:
+
+![](images/results_page_D_0.png)
 
 ## Concepts
 
