@@ -12,6 +12,41 @@
 └── README.md
 ```
 
+## Run
+
+### HouseGANPP
+
+By cloning the houseganpp repo,
+
+```
+git clone https://github.com/ennauata/houseganpp
+```
+
+or clone this repo recursively.
+
+```
+git clone --recurse-submodules https://github.com/enhuiz/civl5220-group13
+```
+
+Then go to the houseganpp folder, install requirements
+
+```
+pip intall -r requirements.txt
+```
+
+(or just run it and install what is missing, version seems not important for houseganpp tested on nov. 6, 2021)
+
+After this, you need to change the path in `data/sample_list.txt` like this:
+
+```
+-/home/nelson/Workspace/autodesk/autodesk/rplan_2/json_data_update/7513.json
++data/json/7513.json
+```
+
+Run `python test.py`, you will get the `dump` folder, which contains something like:
+
+![](images/fp_final_0.png)
+
 ## Concepts
 
 ### Glossary
@@ -31,7 +66,7 @@ An example training data from: `3rdparty/houseganpp/data/json/7513.json`
 {
   // 14 rooms, each has a type
   "room_type": [3, 3, 2, 5, 4, 5, 1, 17, 17, 17, 17, 17, 17, 15],
-  // box coord, range from [0, 256) (exclusive?)
+  // 14 box coord, range from [0, 256) (exclusive?)
   "boxes": [
     [51.0, 56.0, 96.0, 107.0],
     [78.0, 113.0, 124.0, 168.0],
