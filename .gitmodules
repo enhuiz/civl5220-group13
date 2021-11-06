@@ -4,3 +4,6 @@
 [submodule "3rdparty/houseganpp"]
 	path = 3rdparty/houseganpp
 	url = https://github.com/ennauata/houseganpp
+[submodule "overleaf/progress-report"]
+	path = overleaf/progress-report
+	url = https://git.overleaf.com/6186346226f07564af4760b3
