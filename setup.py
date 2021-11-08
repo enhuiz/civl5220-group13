@@ -50,7 +50,7 @@ setup(
     url="https://github.com/enhuiz/civl5220-group13",
     entry_points={
         "console_scripts": [
-            "civl5220_group13-toolkit=civl5220_group13.toolkit:main",
+            "civl5220-group13=civl5220_group13.bin:main",
         ],
     },
 )

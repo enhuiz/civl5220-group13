@@ -22,7 +22,6 @@ import numpy as np
 import PIL
 from PIL import Image, ImageDraw, ImageFilter
 import random
-from bidict import bidict
 
 
 def filter_graphs(graphs, min_h=0.03, min_w=0.03):
@@ -45,40 +44,6 @@ def filter_graphs(graphs, min_h=0.03, min_w=0.03):
 
 
 class FloorplanGraphDataset(Dataset):
-    room_table = bidict(
-        {
-            "living_room": 1,
-            "kitchen": 2,
-            "bedroom": 3,
-            "bathroom": 4,
-            "balcony": 5,
-            "entrance": 6,
-            "dining room": 7,
-            "study room": 8,
-            "storage": 10,
-            "front door": 15,
-            "unknown": 16,
-            "interior_door": 17,
-        }
-    )
-
-    color_table = bidict(
-        {
-            1: "#EE4D4D",
-            2: "#C67C7B",
-            3: "#FFD274",
-            4: "#BEBEBE",
-            5: "#BFE3E8",
-            6: "#7BA779",
-            7: "#E87A90",
-            8: "#FF8C69",
-            10: "#1F849B",
-            15: "#727171",
-            16: "#785A67",
-            17: "#D3A2C7",
-        }
-    )
-
     def __init__(self, data_path, transform=None, target_set=8, split="train"):
         super(Dataset, self).__init__()
         self.split = split

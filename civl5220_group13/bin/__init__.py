@@ -1,11 +1,11 @@
 import sys
 from argparse_node import ArgumentParserNode
 
-from . import show_sample
+from . import show_sample, housegan
 
 
 def add_argument(parser):
-    return [show_sample]
+    return [show_sample, housegan]
 
 
 def main():

@@ -1,13 +1,9 @@
-import json
 import matplotlib.pyplot as plt
 import bbox_visualizer as bbv
 import numpy as np
 from PIL import Image
 
-
-def load_json(path):
-    with open(path, "r") as f:
-        return json.load(f)
+from .utils import load_json
 
 
 def add_argument(parser):
