@@ -29,7 +29,7 @@ def extract_edges(boxes):
     edges = []
     for i, j in combinations(range(len(boxes)), 2):
         edges.append([i, 1 if is_adjacent(boxes[i], boxes[j]) else -1, j])
-    return edges
+    return np.array(edges)
 
 
 def plot_graph(nodes, edges, show_name=True):

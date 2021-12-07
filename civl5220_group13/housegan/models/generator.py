@@ -148,6 +148,10 @@ class Generator(nn.Module):
             *conv_block(128, 1, 3, 1, 1, act="tanh")
         )
 
+    @property
+    def latent_dim(self):
+        return 128
+
     def forward(self, z, given_y=None, given_w=None):
         z = z.view(-1, 128)
         # include nodes
