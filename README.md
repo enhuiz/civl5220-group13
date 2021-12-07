@@ -7,10 +7,47 @@
 ├── 3rdparty
 │   ├── housegan        # ennauata's housegan, we may take some code from it
 │   └── houseganpp      # ennauata's newer version
-├── housegan13          # our code, python only, I'm gonna start from here
+├── civl5220_group13          # our code, python only, I'm gonna start from here
 ├── overleaf            # put our overleaf documents
 └── README.md
 ```
+
+## Quick Start
+
+### Installation
+
+```
+$ pip install .
+```
+
+### Download the dataset (HouseGAN)
+
+```
+# i.e. goto https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu_connect_ust_hk/EiWYJksoDsNDk5tqfRap70UBT2-jjNHCO7uPfQpFiucSAQ?e=LQ0v3d
+# to download a npy file, perhaps just valid_data.npy
+```
+
+### Understand the dataset
+
+```
+$ civl5220-group13 housegan visualize_dataset valid_data.npy
+
+# you may also go to civl5220_group13/housegan/visualize_dataset.py for details
+```
+
+### Produce Graph from the raw dataset
+
+Basically, we have nodes (room types) and the boxes (bounding boxes of the room), we don't have the connection information, hence we need to extract the edges of the graph.
+
+```
+$ civl5220-group13 housegan extract_edges valid_data.npy
+
+# you may also go to civl5220_group13/housegan/extract_edges.py for details
+```
+
+<details>
+
+<summary> Toggle: the old stuff. </summary>
 
 ## Run
 
@@ -282,6 +319,8 @@ Each room has a **axes-aligned** (i.e. either horizontal or vertical) box, repre
 By drawing the boxes from the above sample on a `256x256` canvas, we can get:
 
 ![](images/2021-11-05-16-30-43.png)
+
+</details>
 
 ## Notes
 
