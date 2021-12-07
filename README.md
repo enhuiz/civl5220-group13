@@ -1,29 +1,29 @@
 # CIVL5220 Group13
 
-## Quick Start
+## 1 Quick Start
 
-### Installation
+### 1.1 Installation
 
 ```
-$ pip install .
+pip install .
 ```
 
-### Download the dataset
+### 1.2 Download the dataset
 
 Download it [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu_connect_ust_hk/EiWYJksoDsNDk5tqfRap70UBT2-jjNHCO7uPfQpFiucSAQ?e=LQ0v3d).
 
-### Understand the dataset
+### 1.3 Understand the dataset
 
 ```
-$ civl5220-group13 housegan visualize_dataset valid_data.npy
+civl5220-group13 housegan visualize_dataset valid_data.npy
 ```
 
-### Produce Graph from the raw dataset
+### 1.4 Produce Graph from the raw dataset
 
 We have nodes (room types) and the boxes (bounding boxes of the room), we don't have the connection information, hence we need to extract the edges of the graph.
 
 ```
-$ civl5220-group13 housegan extract_edges valid_data.npy
+civl5220-group13 housegan extract_edges valid_data.npy
 ```
 
 <details>
