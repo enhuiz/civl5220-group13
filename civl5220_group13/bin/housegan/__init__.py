@@ -1,5 +1,5 @@
-from . import inference
+from . import inference, visualize_dataset
 
 
 def add_argument(parser):
-    return [inference]
+    return [inference, visualize_dataset]
