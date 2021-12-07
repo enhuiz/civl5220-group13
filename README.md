@@ -18,6 +18,8 @@ Download dataset [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zn
 civl5220-group13 housegan visualize_dataset valid_data.npy
 ```
 
+![](./images/visualize-dataset.png)
+
 ### 1.4 Produce graph
 
 We have nodes (room types) and the boxes (bounding boxes of the room), we don't have the connection information, hence we need to extract the edges of the graph.
@@ -26,6 +28,8 @@ We have nodes (room types) and the boxes (bounding boxes of the room), we don't 
 civl5220-group13 housegan extract_edges valid_data.npy
 ```
 
+![](./images/graph.png)
+
 ### 1.5 Download model and inference
 
 Download model [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu_connect_ust_hk/EiWYJksoDsNDk5tqfRap70UBT2-jjNHCO7uPfQpFiucSAQ?e=LQ0v3d).
@@ -33,6 +37,8 @@ Download model [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu
 ```
 civl5220-group13 housegan inference valid_data.npy --ckpt exp_demo_D_500000.pth
 ```
+
+![](./images/inference.png)
 
 <details>
 

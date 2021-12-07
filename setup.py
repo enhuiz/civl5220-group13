@@ -36,7 +36,7 @@ setup(
     version=write_version("0.0.1", True),
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=["civl5220_group13"],
+    packages=find_packages(),
     install_requires=["argparse-node==0.0.2"],
     url="https://github.com/enhuiz/civl5220-group13",
     entry_points={
