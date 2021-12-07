@@ -32,7 +32,7 @@ def extract_edges(boxes):
     return edges
 
 
-def plot_graph(nodes, edges, canvas_size=128):
+def plot_graph(nodes, edges, show_name=True):
     """
     Args:
         nodes: list of intergers, starting from 1 (not 0).
@@ -40,12 +40,11 @@ def plot_graph(nodes, edges, canvas_size=128):
     """
     graph = AGraph(strict=False, directed=False)
 
-    for node in nodes:
+    for i, node in enumerate(nodes):
         color = ID_COLOR[node]
-        name = ROOM_CLASS[node]
-        graph.add_node(node, label=name, color=color)
+        name = str(i) + "." + ROOM_CLASS[node]
+        graph.add_node(i, label=name if show_name else "", color=color)
 
-    # Create edges
     for i, p, j in edges:
         if p > 0:
             graph.add_edge(i, j, color="black", penwidth="4")
@@ -55,7 +54,6 @@ def plot_graph(nodes, edges, canvas_size=128):
 
     file = tempfile.NamedTemporaryFile()
     graph.draw(file.name, "png")
-
     plt.imshow(plt.imread(file.name))
 
     # this also deletes the temp file from disk
@@ -65,6 +63,7 @@ def plot_graph(nodes, edges, canvas_size=128):
 def add_argument(parser):
     parser.add_argument("path")
     parser.add_argument("--no-filter", action="store_true")
+    parser.add_argument("--show-name", action="store_true")
 
 
 def main(args):
@@ -77,5 +76,5 @@ def main(args):
 
     for nodes, boxes in data:
         edges = extract_edges(boxes)
-        plot_graph(nodes, edges)
+        plot_graph(nodes, edges, args.show_name)
         plt.show()
