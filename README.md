@@ -8,22 +8,30 @@
 pip install .
 ```
 
-### 1.2 Download the dataset
+### 1.2 Download dataset
 
-Download it [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu_connect_ust_hk/EiWYJksoDsNDk5tqfRap70UBT2-jjNHCO7uPfQpFiucSAQ?e=LQ0v3d).
+Download dataset [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu_connect_ust_hk/EiWYJksoDsNDk5tqfRap70UBT2-jjNHCO7uPfQpFiucSAQ?e=LQ0v3d).
 
-### 1.3 Understand the dataset
+### 1.3 Understand dataset
 
 ```
 civl5220-group13 housegan visualize_dataset valid_data.npy
 ```
 
-### 1.4 Produce Graph from the raw dataset
+### 1.4 Produce graph
 
 We have nodes (room types) and the boxes (bounding boxes of the room), we don't have the connection information, hence we need to extract the edges of the graph.
 
 ```
 civl5220-group13 housegan extract_edges valid_data.npy
+```
+
+### 1.5 Download model and inference
+
+Download model [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu_connect_ust_hk/EiWYJksoDsNDk5tqfRap70UBT2-jjNHCO7uPfQpFiucSAQ?e=LQ0v3d).
+
+```
+civl5220-group13 housegan inference valid_data.npy --ckpt exp_demo_D_500000.pth
 ```
 
 <details>
