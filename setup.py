@@ -32,12 +32,20 @@ with open("README.md", "r") as f:
 
 setup(
     name="civl5220_group13",
-    python_requires=">=3.9.0",
+    python_requires=">=3.7.0",
     version=write_version("0.0.1", True),
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(),
-    install_requires=["argparse-node==0.0.2"],
+    install_requires=[
+        "argparse-node>=0.0.2",
+        "opencv-python",
+        "webcolors",
+        "bidict",
+        "pygraphviz",
+        "torch",
+        "matplotlib",
+    ],
     url="https://github.com/enhuiz/civl5220-group13",
     entry_points={
         "console_scripts": [
