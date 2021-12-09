@@ -8,12 +8,18 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from PIL import Image
 from celluloid import Camera
+from itertools import combinations
 
 from .models.generator import Generator
 from .utils import ROOM_CLASS, load_data
 from .visualize_dataset import plot_floorplan
 from .extract_edges import extract_edges, plot_graph
 from .inference import plot_graph, plot_masks, mask_to_box
+
+
+def parse_bool(s):
+    assert s.lower() in ["true", "false"]
+    return s.lower() == "true"
 
 
 def add_argument(parser):
@@ -33,7 +39,7 @@ def add_argument(parser):
     parser.add_argument(
         "--num-iters",
         type=int,
-        default=20000,
+        default=10000,
         help="number of iterations",
     )
     parser.add_argument(
@@ -48,11 +54,28 @@ def add_argument(parser):
         help="number of iterations",
     )
     parser.add_argument(
-        "--constraint-mask",
+        "--mask-constraint",
         type=Path,
         help="constraint mask",
         default="toy_mask.txt",
     )
+    parser.add_argument(
+        "--general-constraint",
+        type=parse_bool,
+        default=True,
+    )
+
+
+class GeneralConstraint(nn.Module):
+    def forward(self, masks):
+        # TODO:
+        loss = 0
+        ijs = list(combinations(range(len(masks)), 2))
+        for i, j in ijs:
+            # minimize overlap
+            loss += (masks[i] * masks[j]).clamp(min=0).mean()
+        loss /= len(ijs)
+        return loss
 
 
 class MaskConstraint(nn.Module):
@@ -67,7 +90,7 @@ class MaskConstraint(nn.Module):
             with open(path, "r") as f:
                 content = f.read().strip()
                 content = content.replace("_", "0")
-                content = content.replace("x", "1")
+                content = content.replace("#", "1")
             lines = content.splitlines()
             lines = [list(map(int, line.strip())) for line in lines]
             mask = np.array(lines)
@@ -94,11 +117,16 @@ def main(args):
 
     data = load_data(args.path)
 
-    if args.constraint_mask is None:
-        mask_contraint = None
+    if args.mask_constraint is None:
+        mask_constraint = None
     else:
-        mask_contraint = MaskConstraint(args.constraint_mask)
-        mask_contraint.to(args.device)
+        mask_constraint = MaskConstraint(args.mask_constraint)
+        mask_constraint.to(args.device)
+
+    if args.general_constraint:
+        general_constraint = GeneralConstraint()
+    else:
+        general_constraint = None
 
     for i, (nodes, boxes) in enumerate(data):
         edges = extract_edges(boxes)
@@ -126,9 +154,13 @@ def main(args):
         for j in pbar:
             optimizer.zero_grad()
             fake_masks = generator(z, onehot_nodes, edges_tensor)
+
             loss = torch.zeros([], requires_grad=True, device=args.device)
-            if mask_contraint is not None:
-                loss = loss + mask_contraint(fake_masks)
+            if mask_constraint is not None:
+                loss = loss + mask_constraint(fake_masks)
+            if general_constraint is not None:
+                loss = loss + general_constraint(fake_masks)
+
             loss.backward()
             pbar.set_description(f"loss: {loss.item():.3f}")
             optimizer.step()
@@ -136,9 +168,9 @@ def main(args):
             if j % args.plot_every == 0:
                 plt.subplot(141)
                 plot_graph(nodes, edges)
-                if mask_contraint is not None:
+                if mask_constraint is not None:
                     plt.subplot(142)
-                    mask_contraint.plot()
+                    mask_constraint.plot()
                 fake_masks = fake_masks.detach().cpu()  # (k 32 32), k is #nodes
                 plt.subplot(143)
                 plt.gca().text(0.4, 1.05, f"Iter: {j}", transform=plt.gca().transAxes)
@@ -147,7 +179,6 @@ def main(args):
                 fake_boxes = fake_boxes / 32  # 32 for the model output size
                 plt.subplot(144)
                 plot_floorplan(nodes, fake_boxes, im_size=256)
-                plt.suptitle(f"iteration-{j}")
                 camera.snap()
 
         animation = camera.animate()

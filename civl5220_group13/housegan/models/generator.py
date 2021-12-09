@@ -154,10 +154,13 @@ class Generator(nn.Module):
 
     def forward(self, z, given_y=None, given_w=None):
         z = z.view(-1, 128)
+
         # include nodes
-        if True:
-            y = given_y.view(-1, 10)
-            z = torch.cat([z, y], 1)
+        # if True:
+        y = given_y.view(-1, 10)
+        z = torch.cat([z, y], 1)
+        # endif
+
         x = self.l1(z)
         x = x.view(-1, 16, self.init_size, self.init_size)
         x = self.cmp_1(x, given_w).view(-1, *x.shape[1:])
