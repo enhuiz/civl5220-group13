@@ -41,7 +41,14 @@ def plot_floorplan(nodes, boxes, im_size=256):
 
     plt.imshow(im)
     patches = [Patch(color=ID_COLOR[k], label=ROOM_CLASS[k]) for k in ROOM_CLASS]
-    plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
+    plt.legend(
+        handles=patches,
+        bbox_to_anchor=(1.05, 1),
+        loc=2,
+        borderaxespad=0.0,
+        prop={"size": 6},
+    )
+    plt.tight_layout()
 
 
 def add_argument(parser):
