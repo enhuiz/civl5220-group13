@@ -42,13 +42,17 @@ civl5220-group13 housegan inference valid_data.npy --ckpt exp_demo_D_500000.pth
 
 ### 1.6 Constraint inference
 
-Download model [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu_connect_ust_hk/EiWYJksoDsNDk5tqfRap70UBT2-jjNHCO7uPfQpFiucSAQ?e=LQ0v3d).
-
 ```
 civl5220-group13 housegan constraint_inference valid_data.npy --ckpt exp_demo_D_500000.pth --constraint-mask toy_masks/0.txt
 ```
 
-![](./images/generate.gif)
+![](./images/generated-0.gif)
+
+![](./images/generated-1.gif)
+
+![](./images/generated-2.gif)
+
+![](./images/generated-3.gif)
 
 ## Old Stuff
 
