@@ -41,7 +41,7 @@ def main(args):
     masks = list(zip(*data["masks"]))  # t b -> b t
 
     for i, mi in enumerate(tqdm.tqdm(masks)):
-        fig = plt.figure(figsize=(20, 10))
+        fig = plt.figure(figsize=(20, 6))
         camera = Camera(fig)
         for mij, j in zip(mi, iters):
             plot_all(nodes, edges, cmask, mij, j)
