@@ -1,7 +1,5 @@
 """
 This script help you visualize the pre-processed data from HouseGAN.
-
-pip install matplotlib Image numpy bidict
 """
 
 import numpy as np
