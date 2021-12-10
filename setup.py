@@ -45,6 +45,9 @@ setup(
         "pygraphviz",
         "torch",
         "matplotlib",
+        "tqdm",
+        "celluloid",
+        "einops",
     ],
     url="https://github.com/enhuiz/civl5220-group13",
     entry_points={
