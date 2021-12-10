@@ -157,6 +157,10 @@ def main(args):
     generator.load_state_dict(torch.load(args.ckpt, "cpu"))
     generator.to(args.device)
 
+    for p in generator.parameters():
+        # this may make bakcward faster
+        p.requires_grad_(False)
+
     data = load_data(args.path)
 
     postprocess = Postprocess()
