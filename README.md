@@ -44,7 +44,7 @@ civl5220-group13 housegan inference valid_data.npy --ckpt exp_demo_D_500000.pth
 
 ```
 civl5220-group13 housegan constraint_inference valid_data.npy --ckpt exp_demo_D_500000.pth --constraint-mask toy_masks/0.txt
-civl5220-group13 housegan housegan animate snapshots/0.pkl
+civl5220-group13 housegan animate snapshots/0.pkl
 ```
 
 ![](./images/generated-0.gif)
