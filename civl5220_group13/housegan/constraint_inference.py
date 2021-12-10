@@ -1,20 +1,18 @@
+import pickle
 import tqdm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import torch
-import matplotlib.pyplot as plt
 from pathlib import Path
 from PIL import Image
-from celluloid import Camera
 from itertools import combinations
+from einops import repeat
 
-from .models.generator import Generator
+from .models.batch_generator import Generator
 from .utils import ROOM_CLASS, load_data
-from .visualize_dataset import plot_floorplan
-from .extract_edges import extract_edges, plot_graph
-from .inference import plot_graph, plot_masks, mask_to_box
+from .extract_edges import extract_edges
 
 
 def parse_bool(s):
@@ -43,7 +41,7 @@ def add_argument(parser):
         help="number of iterations",
     )
     parser.add_argument(
-        "--plot-every",
+        "--dump-every",
         type=int,
         default=500,
     )
@@ -62,7 +60,12 @@ def add_argument(parser):
     parser.add_argument(
         "--general-constraint",
         type=parse_bool,
-        default=True,
+        default=False,
+    )
+    parser.add_argument(
+        "--num-variations",
+        type=int,
+        default=32,
     )
 
 
@@ -104,10 +107,8 @@ class MaskConstraint(nn.Module):
         self.mask: torch.Tensor
 
     def forward(self, masks):
-        return F.mse_loss(masks.mean(dim=0), self.mask)
-
-    def plot(self):
-        plot_masks(torch.stack([self.mask]), [1])
+        target = repeat(self.mask, "... -> b ...", b=len(masks))
+        return F.mse_loss(masks.mean(dim=1), target)
 
 
 def main(args):
@@ -139,6 +140,7 @@ def main(args):
         edges_tensor = torch.from_numpy(edges).to(args.device).float()
 
         z = torch.randn(
+            args.num_variations,
             len(onehot_nodes),
             generator.latent_dim,
             device=args.device,
@@ -148,8 +150,12 @@ def main(args):
         optimizer = torch.optim.AdamW([z], lr=args.lr)
         pbar = tqdm.trange(args.num_iters)
 
-        fig = plt.figure(figsize=(10, 5))
-        camera = Camera(fig)
+        data = dict(
+            edges=edges,
+            nodes=nodes,
+            cmask=mask_constraint.mask.cpu().numpy(),
+            masks=[],
+        )
 
         for j in pbar:
             optimizer.zero_grad()
@@ -165,21 +171,9 @@ def main(args):
             pbar.set_description(f"loss: {loss.item():.3f}")
             optimizer.step()
 
-            if j % args.plot_every == 0:
-                plt.subplot(141)
-                plot_graph(nodes, edges)
-                if mask_constraint is not None:
-                    plt.subplot(142)
-                    mask_constraint.plot()
-                fake_masks = fake_masks.detach().cpu()  # (k 32 32), k is #nodes
-                plt.subplot(143)
-                plt.gca().text(0.4, 1.05, f"Iter: {j}", transform=plt.gca().transAxes)
-                plot_masks(fake_masks, nodes)
-                fake_boxes = np.array([mask_to_box(mask) for mask in fake_masks])
-                fake_boxes = fake_boxes / 32  # 32 for the model output size
-                plt.subplot(144)
-                plot_floorplan(nodes, fake_boxes, im_size=256)
-                camera.snap()
-
-        animation = camera.animate()
-        animation.save(f"plan-{i:06d}.gif")
+            if j % args.dump_every == 0:
+                data["masks"].append(fake_masks.detach().cpu().numpy())
+                path = Path(f"snapshots/{i}.pkl")
+                path.parent.mkdir(parents=True, exist_ok=True)
+                with open(path, "wb") as f:
+                    pickle.dump(data, f)
