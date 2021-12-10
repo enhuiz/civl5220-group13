@@ -19,7 +19,6 @@ def plot_all(nodes, edges, cmask, masks, iteration):
 
     plt.subplot(142)
     plot_masks([1], np.array([cmask]))
-    plt.gca().text(0.4, 1.05, f"Iter: {iteration}", transform=plt.gca().transAxes)
 
     plt.subplot(143)
     plot_masks(nodes, masks)
@@ -27,6 +26,7 @@ def plot_all(nodes, edges, cmask, masks, iteration):
 
     plt.subplot(144)
     plot_floorplan(nodes, masks)
+    plt.gca().text(0.4, 1.05, f"Iter: {iteration}", transform=plt.gca().transAxes)
 
 
 def main(args):
