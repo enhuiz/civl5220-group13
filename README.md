@@ -45,10 +45,10 @@ civl5220-group13 housegan inference valid_data.npy --ckpt exp_demo_D_500000.pth
 Download model [here](https://hkustconnect-my.sharepoint.com/:f:/g/personal/zniu_connect_ust_hk/EiWYJksoDsNDk5tqfRap70UBT2-jjNHCO7uPfQpFiucSAQ?e=LQ0v3d).
 
 ```
-civl5220-group13 housegan constraint_inference valid_data.npy --ckpt exp_demo_D_500000.pth --constraint-mask toy_mask.txt
+civl5220-group13 housegan constraint_inference valid_data.npy --ckpt exp_demo_D_500000.pth --constraint-mask toy_masks/0.txt
 ```
 
-![](./images/generate.png)
+![](./images/generate.gif)
 
 ## Old Stuff
 
