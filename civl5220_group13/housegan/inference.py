@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw
 
 from .models.generator import Generator
 from .utils import ROOM_CLASS, ID_COLOR, load_data
-from .visualize_dataset import plot_floorplan
+from .visualize_dataset import plot_floorplan as plot_floorplan_impl
 from .extract_edges import extract_edges, plot_graph
 
 
@@ -34,8 +34,9 @@ def add_argument(parser):
     )
 
 
-def plot_masks(masks, nodes, size=(256, 256)):
-    masks = masks.detach().cpu().numpy()
+def plot_masks(nodes, masks, size=(256, 256)):
+    if isinstance(masks, torch.Tensor):
+        masks = masks.detach().cpu().numpy()
 
     # let me try to understand this
     canvas = Image.new("RGBA", size, (255, 255, 255, 0))
@@ -95,6 +96,14 @@ def mask_to_box(mask):
     return [x0, y0, x1 + 1, y1 + 1]
 
 
+def plot_floorplan(nodes, masks, im_size=256):
+    if isinstance(masks, torch.Tensor):
+        masks = masks.detach().cpu().numpy()
+    boxes = np.array([mask_to_box(mask) for mask in masks])
+    boxes = boxes / 32  # 32 for the model output size
+    return plot_floorplan_impl(nodes, boxes, im_size)
+
+
 @torch.no_grad()
 def main(args):
     generator = Generator()
@@ -120,15 +129,11 @@ def main(args):
 
         # mask is the raw output of the model
         fake_masks = generator(z, onehot_nodes, edges)
-        fake_masks = fake_masks.detach().cpu()  # (k 32 32), k is #nodes
 
         plt.subplot(132)
-        plot_masks(fake_masks, nodes)
-
-        # box is always rectangle
-        fake_boxes = np.array([mask_to_box(mask) for mask in fake_masks])
-        fake_boxes = fake_boxes / 32  # 32 for the model output size
+        plot_masks(nodes, fake_masks)
 
         plt.subplot(133)
-        plot_floorplan(nodes, fake_boxes, im_size=256)
+        plot_floorplan(nodes, fake_masks)
+
         plt.show()
