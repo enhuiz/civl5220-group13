@@ -9,7 +9,7 @@ class NLCCSCriterion(nn.Module):
     Non-largest connected component suppression.
     """
 
-    def forward(self, masks):
+    def forward(self, masks, **_):
         """
         Args:
             masks: (b k h w)

@@ -43,11 +43,11 @@ class FIoUCriterion(nn.Module):
         assert node in self.affiliated_list
         return "a"
 
-    def forward(self, nodes, masks):
+    def forward(self, masks, nodes):
         """
         Args:
-            nodes: (n)
             masks: (b n h w)
+            nodes: (n)
         """
         masks = ((masks + 1) / 2).clamp(min=0)  # [-1, 1] -> [0, 1]
 
@@ -76,16 +76,17 @@ class FIoUCriterion(nn.Module):
                 iou_is_good = True
 
             # batched mask
-            mi, mj = masks[:, [i, j]]
+            mi, mj = masks[:, [i, j]].unbind(dim=1)
 
             # sum keep batch
             sumkb = lambda t: t.flatten(1).sum(dim=1)
 
             iou = sumkb(mi * mj) / sumkb(mi + mj - mi * mj)
+            iou = iou.mean()
 
             if iou_is_good:
                 # minimize negative iou
-                losses.append(-iou)
+                losses.append(1 - iou)
             else:
                 losses.append(iou)
 

@@ -1,19 +1,15 @@
-import cv2
 import pickle
 import tqdm
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import numpy as np
 import torch
 from pathlib import Path
-from PIL import Image
-from itertools import combinations
-from einops import repeat
 
 from .models.batch_generator import Generator
 from .utils import ROOM_CLASS, load_data
 from .extract_edges import extract_edges
+from .criterions import NLCCSCriterion, CIoUCriterion, FIoUCriterion
 
 
 def parse_bool(s):
@@ -53,97 +49,20 @@ def add_argument(parser):
         help="number of iterations",
     )
     parser.add_argument(
-        "--mask-constraint",
+        "--contour-mask",
         type=Path,
-        help="constraint mask",
         default="toy_masks/0.txt",
     )
     parser.add_argument(
-        "--general-constraint",
-        type=parse_bool,
-        default=True,
+        "--criterions",
+        nargs="+",
+        default=["nlccs", "fiou", "ciou"],
     )
     parser.add_argument(
         "--num-variations",
         type=int,
         default=4,
     )
-
-
-class Postprocess(nn.Module):
-    def forward(self, masks):
-        ret = torch.zeros_like(masks)
-        for i, mi in enumerate(masks):
-            for j, mij in enumerate(mi):
-                mask = torch.zeros_like(mij)
-                arr = mij.detach().cpu().numpy()
-                arr = ((arr > 0) * 255).astype(np.uint8)
-                _, _, stats, _ = cv2.connectedComponentsWithStats(arr)
-
-                # -1 is the whole image, pick -2
-                stats = sorted(stats, key=lambda l: l[-1])
-                if len(stats) > 1:
-                    w0, h0, dw, dh, _ = stats[-2]
-                    h1 = h0 + dh
-                    w1 = w0 + dw
-                    mask[h0:h1, w0:w1] = 1
-
-                    mij = mask * mij
-                    ret[i][j] = mij
-
-        return ret
-
-
-class GeneralConstraint(nn.Module):
-    def overlap_loss(self, masks):
-        """
-        Args:
-            masks: (b k h w)
-        """
-        loss = 0
-        ijs = list(combinations(range(masks.shape[1]), 2))
-        for i, j in ijs:
-            mi, mj = map(lambda m: m.clamp(min=0), masks[:, [i, j]].unbind(dim=1))
-            # minimize overlap
-            loss += (mi * mj).mean()
-        loss /= len(ijs)
-        return loss
-
-    def forward(self, masks):
-        loss = 0
-        # loss += self.concentration_loss(masks)
-        loss += self.overlap_loss(masks)
-        return loss
-
-
-class MaskConstraint(nn.Module):
-    def __init__(self, path):
-        super().__init__()
-        if path.suffix in [".png", ".jpg", ".jpeg"]:
-            mask = Image.open(path)
-            mask = mask.resize((32, 32))
-            mask = np.array(mask) / 255.0
-            mask = torch.from_numpy(mask)
-        else:
-            with open(path, "r") as f:
-                content = f.read().strip()
-                content = content.replace("_", "0")
-                content = content.replace("#", "1")
-            lines = content.splitlines()
-            lines = [list(map(int, line.strip())) for line in lines]
-            mask = np.array(lines)
-            assert mask.shape == (32, 32), f"but got {mask.shape}."
-            mask = torch.from_numpy(mask)
-
-        ones = torch.ones_like(mask).float()
-        mask = torch.where(mask > 0.5, ones, ones.neg())
-
-        self.register_buffer("mask", mask)
-        self.mask: torch.Tensor
-
-    def forward(self, masks):
-        target = repeat(self.mask, "... -> b ...", b=len(masks))
-        return F.mse_loss(masks.mean(dim=1), target)
 
 
 def main(args):
@@ -157,22 +76,24 @@ def main(args):
 
     data = load_data(args.path)
 
-    postprocess = Postprocess()
+    criterions = nn.ModuleList([])
 
-    constraints = nn.ModuleList([])
+    cmask = None
 
-    if args.mask_constraint is not None:
-        constraint = MaskConstraint(args.mask_constraint)
-        cmask = constraint.mask.cpu().numpy()
-        constraints.append(constraint)
-        del constraint
-    else:
-        cmask = None
+    for cname in args.criterions:
+        if cname == "ciou":
+            criterion = CIoUCriterion(args.contour_mask)
+            cmask = criterion.mask.cpu().numpy()
+        elif cname == "fiou":
+            criterion = FIoUCriterion()
+        elif cname == "nlccs":
+            criterion = NLCCSCriterion()
+        else:
+            raise NotImplementedError()
+        criterions.append(criterion)
+        del criterion
 
-    constraints.to(args.device)
-
-    if args.general_constraint:
-        constraints.append(GeneralConstraint())
+    criterions.to(args.device)
 
     for i, (nodes, boxes) in enumerate(data):
         edges = extract_edges(boxes)
@@ -206,11 +127,10 @@ def main(args):
         for j in pbar:
             optimizer.zero_grad()
             fake_masks = generator(z, onehot_nodes, edges_tensor)
-            fake_masks = postprocess(fake_masks)
 
             loss = torch.zeros([], requires_grad=True, device=args.device)
-            for constraint in constraints:
-                loss = loss + constraint(fake_masks)
+            for criterion in criterions:
+                loss = loss + criterion(masks=fake_masks, nodes=nodes)
 
             loss.backward()
 
