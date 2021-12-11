@@ -38,7 +38,7 @@ class ContourMetrics:
         real = cv2.resize(real, (self.im_size,) * 2, interpolation=cv2.INTER_AREA)
         fake = self.draw_boxes(boxes)  # fake contour map
 
-        real, fake = map(lambda x: x.astype(np.uint8), [real, fake])
+        real, fake = map(np.bool_, [real, fake])
 
         i = real & fake
         u = real | fake
