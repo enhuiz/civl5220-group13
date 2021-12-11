@@ -14,6 +14,8 @@ class NLCCSCriterion(nn.Module):
         Args:
             masks: (b k h w)
         """
+        masks = ((masks + 1) / 2).clamp(min=0)  # [-1, 1] -> [0, 1]
+
         losses = []
 
         for mask in masks.flatten(0, 1).unbind(0):
