@@ -4,7 +4,11 @@ import torch
 import torch.nn as nn
 
 
-class ConnectedComponentCriterion(nn.Module):
+class NLCCSCriterion(nn.Module):
+    """
+    Non-largest connected component suppression.
+    """
+
     def forward(self, masks):
         """
         Args:
@@ -37,5 +41,5 @@ class ConnectedComponentCriterion(nn.Module):
 
 
 if __name__ == "__main__":
-    criterion = ConnectedComponentCriterion()
+    criterion = NLCCSCriterion()
     print(criterion(torch.randn(3, 3, 5, 5)))
