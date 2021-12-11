@@ -91,12 +91,6 @@ class Postprocess(nn.Module):
                     mij = mask * mij
                     ret[i][j] = mij
 
-                    # plt.subplot(211)
-                    # plt.imshow(arr)
-                    # plt.subplot(212)
-                    # plt.imshow(mij.detach().cpu().numpy())
-                    # plt.show()
-
         return ret
 
 
