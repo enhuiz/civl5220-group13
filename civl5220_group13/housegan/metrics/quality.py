@@ -48,7 +48,7 @@ class QualityMetrics:
         w, h = max(0, x2 - x1), max(0, y2 - y1)
 
         area = w * h
-        cr = area / min(carea, garea)
+        cr = area / (min(carea, garea) + 1e-7)
 
         return cr
 
