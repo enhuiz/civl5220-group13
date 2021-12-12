@@ -34,8 +34,8 @@ class NLCCSCriterion(nn.Module):
                 w1 = w0 + dw
                 # dont penalize the largest connected component
                 pmask[h0:h1, w0:w1] = 0
-
-            losses.append((pmask * mask).mean())
+                # only penalty when there is more than 1 connected component
+                losses.append((pmask * mask).mean())
 
         loss = torch.stack(losses).mean()
 
