@@ -7,7 +7,7 @@ from civl5220_group13.housegan.inference import plot_floorplan_impl, plot_graph
 # ids for you to make loading easier
 eval_list = [10, 12, 13, 14, 22, 27, 32, 36, 43, 7]
 
-with open("./10.pkl", "rb") as f:
+with open("./7.pkl", "rb") as f:
     data = pickle.load(f)
 
 print(data.keys())

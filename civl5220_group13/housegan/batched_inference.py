@@ -159,13 +159,12 @@ def main(args):
 
             # mask is the raw output of the model
             fake_masks = generator(z, onehot_nodes, edges)
-            fake_masks = fake_masks / 32.0
             fake_masks = fake_masks.cpu().numpy()
 
             for sample_fake_masks in fake_masks:
                 fake_boxes.append([mask_to_box(mask) for mask in sample_fake_masks])
 
-        snapshot["fake_boxes"] = np.array(fake_boxes[:5000])
+        snapshot["fake_boxes"] = np.array(fake_boxes[:5000]) / 32
 
         with open(f"evaluation/inferenced/{id}.pkl", "wb") as f:
             pickle.dump(snapshot, f)
