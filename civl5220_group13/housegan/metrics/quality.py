@@ -86,7 +86,7 @@ class QualityMetrics:
             elif tij in ["fs", "ff"]:
                 # just continue
                 continue
-            elif tij in ["as", "fa"]:
+            elif tij in ["as", "af"]:
                 # cr is good
                 beta = 1
             else:
