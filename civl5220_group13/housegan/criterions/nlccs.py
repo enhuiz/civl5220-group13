@@ -23,7 +23,7 @@ class NLCCSCriterion(nn.Module):
             pmask = torch.ones_like(mask)
 
             arr = mask.detach().cpu().numpy()
-            arr = ((arr > 0) * 255).astype(np.uint8)
+            arr = ((arr > 0.5) * 255).astype(np.uint8)
             _, _, stats, _ = cv2.connectedComponentsWithStats(arr)
 
             # -1 is the whole image, pick -2

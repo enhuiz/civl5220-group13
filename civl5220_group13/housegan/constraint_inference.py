@@ -34,13 +34,13 @@ def add_argument(parser):
     parser.add_argument(
         "--num-iters",
         type=int,
-        default=10000,
+        default=5000,
         help="number of iterations",
     )
     parser.add_argument(
         "--dump-every",
         type=int,
-        default=500,
+        default=250,
     )
     parser.add_argument(
         "--lr",
@@ -51,7 +51,7 @@ def add_argument(parser):
     parser.add_argument(
         "--contour-mask",
         type=Path,
-        default="toy_masks/0.txt",
+        default="evaluation/contours/irregular.txt",
     )
     parser.add_argument(
         "--criterions",
@@ -61,7 +61,11 @@ def add_argument(parser):
     parser.add_argument(
         "--num-variations",
         type=int,
-        default=4,
+        default=10,
+    )
+    parser.add_argument(
+        "--output",
+        default="default",
     )
 
 
@@ -95,7 +99,15 @@ def main(args):
 
     criterions.to(args.device)
 
+    eval_list = [10, 12, 13, 14, 22, 27, 32, 36, 43, 7]
+
     for i, (nodes, boxes) in enumerate(data):
+        if i not in eval_list:
+            continue
+
+        if i > max(eval_list):
+            break
+
         edges = extract_edges(boxes)
 
         # minus 1 as nodes are not starting from 0 but 1
@@ -144,7 +156,7 @@ def main(args):
             if j % args.dump_every == 0:
                 snapshot["masks"].append(fake_masks.detach().cpu().numpy())
                 snapshot["iters"].append(j)
-                path = Path(f"snapshots/{i}.pkl")
+                path = Path(f"snapshots/{args.output}/{i}.pkl")
                 path.parent.mkdir(parents=True, exist_ok=True)
                 with open(path, "wb") as f:
                     pickle.dump(snapshot, f)

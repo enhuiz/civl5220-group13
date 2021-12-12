@@ -8,7 +8,7 @@ from pathlib import Path
 contour_metric = ContourMetrics()
 quality_metric = QualityMetrics()
 
-with open("./contours/irregular.txt") as f:
+with open("./contours/rectangle.txt") as f:
     contour = np.array([list(line) for line in f.read().splitlines()])
     assert contour.shape == (32, 32)
     contour = np.where(contour == "#", 1, -1)
@@ -31,5 +31,6 @@ for path in paths:
         scores.append(score)
 
 df = pd.DataFrame(scores)
-print(df.mean())
-print(df.std())
+
+df = df.mean().apply(lambda s: f"{s:.3f}") + df.std().apply(lambda s: f" $\pm$ {s:.3f}")
+print(df.T)
