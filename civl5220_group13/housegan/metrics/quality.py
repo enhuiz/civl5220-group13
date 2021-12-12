@@ -60,11 +60,11 @@ class QualityMetrics:
         assert node in self.affiliated_list
         return "a"
 
-    def __call__(self, nodes, boxes):
+    def __call__(self, boxes, nodes):
         """
         Args:
-            nodes: (n)
             boxes: (n 4)
+            nodes: (n)
         """
         scores = []
 
@@ -103,7 +103,6 @@ class QualityMetrics:
 if __name__ == "__main__":
     metric = QualityMetrics()
     score = metric(
-        np.random.randint(1, 10, 3),
         np.array(
             [
                 [0, 0, 1, 1],
@@ -111,5 +110,6 @@ if __name__ == "__main__":
                 [0.5, 0.2, 1, 1],
             ]
         ),
+        np.random.randint(1, 10, 3),
     )
     print(score)
