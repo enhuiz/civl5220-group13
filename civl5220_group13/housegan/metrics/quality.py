@@ -97,7 +97,7 @@ class QualityMetrics:
 
             scores.append(np.abs(beta - cr))
 
-        return np.mean(scores)
+        return 1 - np.mean(scores)
 
 
 if __name__ == "__main__":
