@@ -60,20 +60,22 @@ class FIoUCriterion(nn.Module):
 
             ni, nj = nodes[[i, j]]
             ti, tj = map(self.get_node_type, [ni, nj])
-            tij = ti + tj
+            tij = "".join(sorted(ti + tj))
 
-            iou_is_good = False
+            beta = None
 
             # should be 9 types
             if tij in ["ss", "aa"]:
-                # iou is bad
-                iou_is_good = False
-            elif tij in ["sf", "fs", "ff"]:
+                # cr is bad
+                beta = 0
+            elif tij in ["fs", "ff"]:
                 # just continue
                 continue
-            elif tij in ["as", "sa", "af", "fa"]:
-                # iou is good
-                iou_is_good = True
+            elif tij in ["as", "fa"]:
+                # cr is good
+                beta = 1
+            else:
+                raise ValueError(tij)
 
             # batched mask
             mi, mj = masks[:, [i, j]].unbind(dim=1)
@@ -81,14 +83,10 @@ class FIoUCriterion(nn.Module):
             # sum keep batch
             sumkb = lambda t: t.flatten(1).sum(dim=1)
 
-            iou = sumkb(mi * mj) / sumkb(mi + mj - mi * mj)
-            iou = iou.mean()
+            cr = sumkb(mi * mj) / torch.minimum(sumkb(mi), sumkb(mj))
+            cr = cr.mean()
 
-            if iou_is_good:
-                # minimize negative iou
-                losses.append(1 - iou)
-            else:
-                losses.append(iou)
+            losses.append((beta - cr).abs())
 
         loss = torch.stack(losses).mean()
 
@@ -98,7 +96,7 @@ class FIoUCriterion(nn.Module):
 if __name__ == "__main__":
     metric = FIoUCriterion()
     score = metric(
-        torch.tensor([1, 2, 3]),
         torch.randn(2, 3, 3, 3),
+        torch.tensor([1, 2, 3]),
     )
     print(score)

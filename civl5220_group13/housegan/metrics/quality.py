@@ -37,7 +37,7 @@ class QualityMetrics:
         ]
     )
 
-    def bbox_iou(self, bbox1, bbox2):
+    def bbox_cr(self, bbox1, bbox2):
         cx1, cy1, cx2, cy2 = bbox1
         gx1, gy1, gx2, gy2 = bbox2
 
@@ -48,9 +48,9 @@ class QualityMetrics:
         w, h = max(0, x2 - x1), max(0, y2 - y1)
 
         area = w * h
-        iou = area / (carea + garea - area)
+        cr = area / min(carea, garea)
 
-        return iou
+        return cr
 
     def get_node_type(self, node):
         if node in self.separate_list:
@@ -75,28 +75,27 @@ class QualityMetrics:
 
             ni, nj = nodes[[i, j]]
             ti, tj = map(self.get_node_type, [ni, nj])
-            tij = ti + tj
+            tij = "".join(sorted(ti + tj))
 
-            iou_is_good = 0
+            beta = 0
 
             # should be 9 types
             if tij in ["ss", "aa"]:
-                # iou is bad
-                iou_is_good = False
-            elif tij in ["sf", "fs", "ff"]:
+                # cr is bad
+                beta = 0
+            elif tij in ["fs", "ff"]:
                 # just continue
                 continue
-            elif tij in ["as", "sa", "af", "fa"]:
-                # iou is good
-                iou_is_good = True
+            elif tij in ["as", "fa"]:
+                # cr is good
+                beta = 1
+            else:
+                raise ValueError(tij)
 
             bi, bj = boxes[[i, j]]
-            iou = self.bbox_iou(bi, bj)
+            cr = self.bbox_cr(bi, bj)
 
-            if iou_is_good:
-                scores.append(iou)
-            else:
-                scores.append(1 - iou)
+            scores.append(np.abs(beta - cr))
 
         return np.mean(scores)
 
@@ -104,7 +103,7 @@ class QualityMetrics:
 if __name__ == "__main__":
     metric = QualityMetrics()
     score = metric(
-        np.array([1, 2, 3]),
+        np.random.randint(1, 10, 3),
         np.array(
             [
                 [0, 0, 1, 1],
