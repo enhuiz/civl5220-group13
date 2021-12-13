@@ -349,3 +349,8 @@ By drawing the boxes from the above sample on a `256x256` canvas, we can get:
 ## Notes
 
 - For Python formatter, I prefer [black](https://github.com/psf/black.git), it is easy to use and consistent.
+
+## Credits
+
+- [House-GAN](https://github.com/ennauata/housegan)
+- [House-GAN++](https://github.com/ennauata/houseganpp)
